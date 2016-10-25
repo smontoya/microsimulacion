@@ -9,40 +9,35 @@ class AnalizadorEvento(object):
 
     def addToQueue(self, name):
 
-        print('#%s Recibiendo informacion  en tiempo %d' % (name, self.env.now))
-        duration = 0.1
-        yield self.env.process(self.charge(duration))
+        print('%0.3f #%s Recibiendo informacion.' % (self.env.now, name))
+        duration = 0.05
+        yield self.env.process(self.hold(duration))
 
         with self.processors.request() as req:
             start = self.env.now
             # Request one of the procesors
             yield req
 
-            print('%s Recibiendo informacion  en tiempo %d' % (name,
-                                                               self.env.now))
-            duration = 1
-            yield self.env.process(self.charge(duration))
-
-            print('%s Buscando y eliminando duplicado %d' % (name,
-                                                             self.env.now))
-            duration = 5
-            yield self.env.process(self.charge(duration))
+            print('%0.3f %s Eliminando duplicado' % (self.env.now, name))
+            duration = 0.3
+            yield self.env.process(self.hold(duration))
 
             # deberian ser dos hilos uno apra el semantico y otro para el
             # analizador de mapa y ranking db
-            print('%s Analizando semanticamente en tiempo %d' % (name,
-                                                                 self.env.now))
-            duration = 3
-            yield self.env.process(self.charge(duration))
+            print('%0.3f %s Analizando semanticamente ' % (self.env.now, name))
+            duration = 1
+            yield self.env.process(self.hold(duration))
 
-            print('%s RE-Categorizando %d' % (name, self.env.now))
-            duration = 3
-            yield self.env.process(self.charge(duration))
+            print('%0.3f %s RE-Categorizando' % (self.env.now, name))
+            duration = 0.5
+            yield self.env.process(self.hold(duration))
 
+            print('%0.3f %s Agregando a BD' % (self.env.now, name))
+            duration = 0.1
+            yield self.env.process(self.hold(duration))
 
-    def charge(self, duration):
+    def hold(self, duration):
         yield self.env.timeout(duration)
-
 
     def generator(self, env, processors, TIME_BT_EVENT):
         for i in itertools.count():

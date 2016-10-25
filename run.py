@@ -4,15 +4,15 @@ import simpy
 
 
 RANDOM_SEED = 42               # custom ramdom seed to control de ramdomize
-PROCESORS = 1     	           # number of procesors working at the same time
-TIME_BT_TWEET = [30, 60]            # Create a tweet every [min, max] seconds
-TIME_BT_EVENT = [10, 60]  # Create a message every [min, max] seconds
-SIM_TIME = 1000                 # Simulation time in seconds
+PROCESORS = 3     	           # number of procesors working at the same time
+TIME_BT_TWEET = [5, 15]            # Create a tweet every [min, max] seconds
+TIME_BT_EVENT = [10, 60]        # Create a message every [min, max] seconds
+SIM_TIME = 100                  # Simulation time in seconds
 CATASTROPHE = ['TERREMOTO', 'INCENDIO',
                'TSUNAMI', 'ACCIDENTE']  # kind of event
-L1_CACHE_SIZE = 32        # 32 KB
-L2_CACHE_SIZE = 32        # 32 KB
-RAM_SIZE = 2048 ** 3      # 2 GB =  2048kb^3
+L1_CACHE_SIZE = 1024 * 32  # 32 KB
+L2_CACHE_SIZE = 1024 * 32  # 32 KB
+RAM_SIZE = 2048 ** 4       # 2 GB =  2048b^4
 
 
 # event manager
