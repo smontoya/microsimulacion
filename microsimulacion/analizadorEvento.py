@@ -18,19 +18,25 @@ class AnalizadorEvento(object):
             # Request one of the procesors
             yield req
 
-            print('%0.3f %s Eliminando duplicado' % (self.env.now, name))
-            duration = 0.3
-            yield self.env.process(self.hold(duration))
-
             # deberian ser dos hilos uno apra el semantico y otro para el
             # analizador de mapa y ranking db
-            print('%0.3f %s Analizando semanticamente ' % (self.env.now, name))
+            print('%0.3f %s Analizando semánticamente ' % (self.env.now, name))
             duration = 1
             yield self.env.process(self.hold(duration))
 
-            print('%0.3f %s RE-Categorizando' % (self.env.now, name))
+            print('%0.3f %s Análsis de Categoria' % (self.env.now, name))
             duration = 0.5
             yield self.env.process(self.hold(duration))
+            posibilidad_error = random.randint(1,50)
+
+            while(posibilidad_error<10) :
+       
+                print('%0.3f %s Análsis de Categoria' % (self.env.now, name))
+                duration = 0.5
+                yield self.env.process(self.hold(duration))
+                posibilidad_error = random.randint(1,100)
+
+
 
             print('%0.3f %s Agregando a BD' % (self.env.now, name))
             duration = 0.1
