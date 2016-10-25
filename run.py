@@ -1,5 +1,6 @@
 from microsimulacion.analizadorTweet import AnalizadorTweet
 from microsimulacion.analizadorEvento import AnalizadorEvento
+from microsimulacion.ingresoPorAplicacion import IngresoPorAplicacion
 import simpy
 
 
@@ -28,7 +29,9 @@ ram = simpy.Container(env, RAM_SIZE, init=0)
 
 eventoPE = AnalizadorEvento(env, procesors)
 tweetPE = AnalizadorTweet(env, procesors, eventoPE)
+appPE = IngresoPorAplicacion(env, procesors, eventoPE)
 env.process(tweetPE.generator(env, procesors, TIME_BT_TWEET))
+env.process(appPE.generator(env, procesors, TIME_BT_EVENT))
 env.process(eventoPE.generator(env, procesors, TIME_BT_EVENT))
 
 

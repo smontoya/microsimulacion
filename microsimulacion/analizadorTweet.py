@@ -32,7 +32,7 @@ class AnalizadorTweet(object):
             duration = 2
             yield self.env.process(self.hold(duration))
 
-            print('%0.3f #%s ANALISIS TERMINADO' % (self.env.now, name))
+            print('%0.3f #%s ANALISIS TWEET TERMINADO' % (self.env.now, name))
 
             # se entrega para que lo agarre la cola de eventos
             self.eventoPE.addToQueue("%s_%s" % (name, "EVENTO"))

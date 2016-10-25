@@ -1,30 +1,31 @@
 import itertools
 import random
-class ingresoPorAplicacion(object):
-    def __init__(self, env, processors):
+class IngresoPorAplicacion(object):
+    def __init__(self, env, processors, eventoPE):
         self.env = env
         self.processors = processors
-        
-    def run(self,name, processors,CREATION_TIME_APP):
-        contador_dato = 0
-        while True:
-            with procesadores as req:
-                yield req
-            contador_dato + 1
-            print('Leyendo informacion  enviada por usuario %i en tiempo %d' % contador_dato % self.env.now)
-            lecture_duration = 1
-            yield self.env.process(self.charge(lecture_duration))
+        self.eventoPE = eventoPE
 
-            print('Enviando datos ingresados a la BD en tiempo%d' % self.env.now)
-            database_duration = 3
-            yield self.env.process(self.charge(database_duration))
+    def addToQueue(self, name):
 
-            print('Enviando mensaje de respuesta a usuario %d' % self.env.now)
-            message_duration = 3
-            yield self.env.process(self.charge(message_duration))
+        print('%0.3f #%s Encolando ingreso por App' % (self.env.now, name))
+        duration = 0.05
+        yield self.env.process(self.hold(duration))
 
+        with self.processors.request() as req:
+            start = self.env.now
+            # Request one of the procesors
+            yield req
 
-    def charge(self, duration):
+            print('%0.3f #%s ANALISIS DE INGRESO POR APP TERMINADO' % (self.env.now, name))
+
+            # se entrega para que lo agarre la cola de eventos
+            self.eventoPE.addToQueue("%s_%s" % (name, "EVENTO"))
+
+    def hold(self, duration):
         yield self.env.timeout(duration)
 
-
+    def generator(self, env, processors, TIME_APP):
+        for i in itertools.count():
+            yield env.timeout(random.randint(*TIME_APP))
+            env.process(self.addToQueue('Tweet %d' % i))
