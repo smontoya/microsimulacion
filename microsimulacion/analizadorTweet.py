@@ -1,43 +1,46 @@
 import itertools
 import random
-class AnalizadorTweet(object):
-    def __init__(self, env, processors):
-        self.env = env
-        # Start the run process everytime an instance is created.
-        self.processors = processors
+# TWEET_SIZE = 140 char * 4 (utf-8) = 560 bytes
 
-    def run(self,name, processors,CREATION_TIME_TWEET                                                                                                                                       ):
-        print('#%s Recibiendo tweet en tiempo %d' % (name, self.env.now))
-        duration = 1
-        yield self.env.process(self.charge(duration))
+
+class AnalizadorTweet(object):
+    def __init__(self, env, processors, eventoPE):
+        self.env = env
+        self.processors = processors
+        self.eventoPE = eventoPE
+
+    def addToQueue(self, name):
+
+        print('%0.3f #%s Encolando tweet' % (self.env.now, name))
+        duration = 0.05
+        yield self.env.process(self.hold(duration))
 
         with self.processors.request() as req:
             start = self.env.now
             # Request one of the procesors
             yield req
 
-            print('#%s Analizando tweet %d' % (name, self.env.now))
-            duration = 5
-            yield self.env.process(self.charge(duration))
+            print('%0.3f #%s Analizando tweet' % (self.env.now, name))
+            duration = 2
+            yield self.env.process(self.hold(duration))
 
-            print('#%s Tomando geo y fecha en tiempo %d' % (name, self.env.now))
-            duration = 3
-            yield self.env.process(self.charge(duration))
+            print('%0.3f #%s Tomando geo y fecha ' % (self.env.now, name))
+            duration = 0.5
+            yield self.env.process(self.hold(duration))
 
-            print('#%s Categorizando tweett %d' % (name, self.env.now))
-            duration = 3
-            yield self.env.process(self.charge(duration))
-            print('#%s ANALIZADO %d' % (name, self.env.now))
+            print('%0.3f #%s Categorizando tweett' % (self.env.now, name))
+            duration = 2
+            yield self.env.process(self.hold(duration))
 
+            print('%0.3f #%s ANALISIS TERMINADO' % (self.env.now, name))
 
+            # se entrega para que lo agarre la cola de eventos
+            self.eventoPE.addToQueue("%s_%s" % (name, "EVENTO"))
 
-    def charge(self, duration):
+    def hold(self, duration):
         yield self.env.timeout(duration)
 
-    def generator(self, env, processors, CREATION_TIME_TWEET                                                                                                                                        ):
+    def generator(self, env, processors, TIME_TWEET):
         for i in itertools.count():
-            yield env.timeout(random.randint(*CREATION_TIME_TWEET                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ))
-            env.process(self.run('Tweet %d' % i, env, processors))
-
-
-
+            yield env.timeout(random.randint(*TIME_TWEET))
+            env.process(self.addToQueue('Tweet %d' % i))
