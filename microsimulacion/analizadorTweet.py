@@ -1,13 +1,19 @@
 import itertools
 import random
+# TWEET_SIZE = 140 char * 4 (utf-8) = 560 bytes
+
+
 class AnalizadorTweet(object):
-    def __init__(self, env, processors):
+    def __init__(self, env, processors, eventoPE):
         self.env = env
-        # Start the run process everytime an instance is created.
         self.processors = processors
-    def run(self,name, processors,TIME_TWEET):
-        print('#%s Recibiendo tweet en tiempo %d' % (name, self.env.now))
-        duration = 1
+        self.eventoPE = eventoPE
+
+
+    def addToQueue(self, name):
+
+        print('#%s Encolando tweet en tiempo %d' % (name, self.env.now))
+        duration = 0.1
         yield self.env.process(self.charge(duration))
 
         with self.processors.request() as req:
@@ -16,17 +22,23 @@ class AnalizadorTweet(object):
             yield req
 
             print('#%s Analizando tweet %d' % (name, self.env.now))
-            duration = 5
+            duration = 4
             yield self.env.process(self.charge(duration))
 
-            print('#%s Tomando geo y fecha en tiempo %d' % (name, self.env.now))
-            duration = 3
+            print('#%s Tomando geo y fecha en tiempo %d' % (name,
+                                                            self.env.now))
+            duration = 2
             yield self.env.process(self.charge(duration))
 
             print('#%s Categorizando tweett %d' % (name, self.env.now))
             duration = 3
             yield self.env.process(self.charge(duration))
-            print('#%s ANALIZADO %d' % (name, self.env.now))
+            print('#%s ANALIZADO Completamente %s %d' % (name, '='*10,
+                                                         self.env.now))
+            self.eventoPE.addToQueue("%s - %s" % (name, "EVENTO"))
+
+
+
 
 
 
@@ -36,7 +48,8 @@ class AnalizadorTweet(object):
     def generator(self, env, processors, TIME_TWEET):
         for i in itertools.count():
             yield env.timeout(random.randint(*TIME_TWEET))
-            env.process(self.run('Tweet %d' % i, env, processors))
+            env.process(self.addToQueue('Tweet %d' % i))
+
 
 
 
