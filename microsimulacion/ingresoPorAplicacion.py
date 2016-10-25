@@ -28,4 +28,4 @@ class IngresoPorAplicacion(object):
     def generator(self, env, processors, TIME_APP):
         for i in itertools.count():
             yield env.timeout(random.randint(*TIME_APP))
-            env.process(self.addToQueue('Tweet %d' % i))
+            env.process(self.addToQueue('ingreso por aplicación %d' % i))
