@@ -5,7 +5,8 @@ class AnalizadorTweet(object):
         self.env = env
         # Start the run process everytime an instance is created.
         self.processors = processors
-    def run(self,name, processors,TIME_TWEET):
+
+    def run(self,name, processors,CREATION_TIME_TWEET                                                                                                                                       ):
         print('#%s Recibiendo tweet en tiempo %d' % (name, self.env.now))
         duration = 1
         yield self.env.process(self.charge(duration))
@@ -33,9 +34,9 @@ class AnalizadorTweet(object):
     def charge(self, duration):
         yield self.env.timeout(duration)
 
-    def generator(self, env, processors, TIME_TWEET):
+    def generator(self, env, processors, CREATION_TIME_TWEET                                                                                                                                        ):
         for i in itertools.count():
-            yield env.timeout(random.randint(*TIME_TWEET))
+            yield env.timeout(random.randint(*CREATION_TIME_TWEET                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ))
             env.process(self.run('Tweet %d' % i, env, processors))
 
 

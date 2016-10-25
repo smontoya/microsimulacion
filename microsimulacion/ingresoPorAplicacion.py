@@ -1,13 +1,11 @@
-import simpy
-
-
+import itertools
+import random
 class ingresoPorAplicacion(object):
-    def __init__(self, env, procesadores):
+    def __init__(self, env, processors):
         self.env = env
-        # Start the run process everytime an instance is created.
-        self.action = env.process(self.run(procesadores))
-
-    def run(self, procesadores):
+        self.processors = processors
+        
+    def run(self,name, processors,CREATION_TIME_APP):
         contador_dato = 0
         while True:
             with procesadores as req:
