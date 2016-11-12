@@ -734,7 +734,7 @@ def reference_point_group(nr_nodes, dimensions, velocity=(0.1, 1.), aggregation=
 
         yield np.dstack((x, y))[0]
         
-def tvc(nr_nodes, dimensions, velocity=(0.1, 1.), aggregation=[0.5,0.], epoch=[100,100]):
+def tvc(nr_nodes, dimensions, velocity=(0.1, 1.), aggregation=[0.5,0.], epoch=[100,100], safepoint=[0,0]):
     '''
     Time-variant Community Mobility Model, discussed in the paper
     
@@ -832,8 +832,10 @@ def tvc(nr_nodes, dimensions, velocity=(0.1, 1.), aggregation=[0.5,0.], epoch=[1
     sintheta = np.sin(theta)
     
     GROUPS = np.arange(len(groups))
+    #Posicion incial usuarios
     g_x = U(0, MAX_X, GROUPS)
     g_y = U(0, MAX_X, GROUPS)
+    
     g_fl = FL_DISTR(GROUPS)
     g_velocity = VELOCITY_DISTR(g_fl)
     g_theta = U(0, 2*np.pi, GROUPS)
@@ -855,10 +857,14 @@ def tvc(nr_nodes, dimensions, velocity=(0.1, 1.), aggregation=[0.5,0.], epoch=[1
         if aggr > 0:
         
             g_x = g_x + g_velocity * g_costheta
+            # g_x = [ 124.1118854]
+            # g_y= [ 124.1118854]
             g_y = g_y + g_velocity * g_sintheta
+            g_x[0]= safepoint[0]
+            g_y[0]= safepoint[1]
             
             # group wrap around when outside the margins (torus shaped area)
-            wrap(g_x, g_y)
+            # wrap(g_x, g_y)
             
             # update info for arrived groups
             g_arrived = np.where(np.logical_and(g_velocity>0., g_fl<=0.))[0]
@@ -890,7 +896,7 @@ def tvc(nr_nodes, dimensions, velocity=(0.1, 1.), aggregation=[0.5,0.], epoch=[1
                 y[g] = y_g + g_velocity[i] * g_sintheta[i] + aggr*np.sin(c_theta)
             
         # node wrap around when outside the margins (torus shaped area)
-        wrap(x, y)
+        #wrap(x, y)
         
         # update info for nodes
         theta = U(0, 2*np.pi, NODES)
