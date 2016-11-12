@@ -604,7 +604,7 @@ def gauss_markov(nr_nodes, dimensions, velocity_mean=1., alpha=1., variance=1.):
                     alpha3 * np.random.normal(0.0, 1.0, nr_nodes))
         
         yield np.dstack((x,y))[0]
-        
+from random import uniform
 def reference_point_group(nr_nodes, dimensions, velocity=(0.1, 1.), aggregation=0.1):
     '''
     Reference Point Group Mobility model, discussed in the following paper:
@@ -638,7 +638,9 @@ def reference_point_group(nr_nodes, dimensions, velocity=(0.1, 1.), aggregation=
         With a value of 0, the nodes are randomly distributed in the simulation area.
         With a value of 1, the nodes are close to the group center.
     '''
-
+    centerx = uniform(0, 1)
+    centery = uniform(0,1)
+    print(centerx, centery)
     try:
         iter(nr_nodes)
     except TypeError:
@@ -684,15 +686,14 @@ def reference_point_group(nr_nodes, dimensions, velocity=(0.1, 1.), aggregation=
         x = x + velocity * costheta
         y = y + velocity * sintheta
         
-        g_x = g_x + g_velocity * g_costheta
-        g_y = g_y + g_velocity * g_sintheta
-        
+        g_x = g_x + g_velocity  * [centerx]
+        g_y = g_y + g_velocity  * [centery]
+
         for (i, g) in enumerate(groups):
-            
             # step to group direction + step to group center
             x_g = x[g]
             y_g = y[g]
-            c_theta = np.arctan2(g_y[i] - y_g, g_x[i] - x_g)
+            c_theta = np.arctan2(g_velocity[i] - y_g, g_x[i] - x_g)
             
             x[g] = x_g + g_velocity[i] * g_costheta[i] + aggregation*np.cos(c_theta)
             y[g] = y_g + g_velocity[i] * g_sintheta[i] + aggregation*np.sin(c_theta)
