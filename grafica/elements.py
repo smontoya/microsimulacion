@@ -27,6 +27,8 @@ class Antena(pygame.sprite.Sprite):
 
     def render(self, screen):
         screen.blit(self.image, [self.x, self.y])
+        pygame.draw.circle(screen, (40,40,40), [self.x, self.y], self.radio*30, 1)
+
 
 
 class ZonaSegura(pygame.sprite.Sprite):

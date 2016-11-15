@@ -18,6 +18,7 @@ print("A -  Muestra o oculta las antenas")
 print("M -  Muestra o oculta el mapa")
 print("R -  Muestra o oculta el radio de antena")
 print("P -  Muestra o oculta personas")
+print("Z -  Muestra o oculta zonas seguras")
 
 
 width = 1024
@@ -25,12 +26,12 @@ height = 600
 
 
 # pos x, posy, radio covertura
-antenas = [Antena(230, 377, 5),
-           Antena(380, 486, 5),
-           Antena(460, 328, 5),
-           Antena(485, 268, 5),
-           Antena(562, 326, 5),
-           Antena(853, 510, 5)
+antenas = [Antena(230, 377, 10),
+           Antena(380, 486, 7),
+           Antena(460, 328, 7),
+           Antena(480, 268, 7),
+           Antena(562, 326, 7),
+           Antena(853, 510, 10)
            ]
 lugares_agrupacion = []
 
