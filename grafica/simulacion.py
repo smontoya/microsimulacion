@@ -1,7 +1,8 @@
-import pygame
 from pygame.locals import *
-import os
+from sys import exit
+import pygame
 import time
+import os
 from grafica.elements import Mapa, Antena, DibujaPersona, ZonaSegura
 from grafica.mobility import *
 import numpy as np
@@ -119,13 +120,10 @@ class IniciarGrafica(threading.Thread):
                          ZonaSegura(721, 162)
                          ]
 
-
-
         pygame.init()
         screen = pygame.display.set_mode((width, height))
         mapa = Mapa("VALPO2.png")
         mapa.resize((width, height))
-
 
         screen.fill(0)
         pygame.display.update()
@@ -143,7 +141,6 @@ class IniciarGrafica(threading.Thread):
             if show_zonas:
                 for zona in zonas_seguras:
                     zona.render(screen)
-
 
             if show_antenas:
                 for antena in antenas:
@@ -175,6 +172,9 @@ class IniciarGrafica(threading.Thread):
                         show_personas = not show_personas
                     elif event.key == pygame.K_z: # tecla A
                         show_zonas = not show_zonas
+                    elif event.key == pygame.K_q: # tecla A
+                        pygame.quit()
+                        exit()
                 elif event.type == pygame.QUIT:
                     running = False
             clock.tick(30)
