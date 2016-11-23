@@ -6,7 +6,7 @@ from grafica.elements import Mapa, Antena, DibujaPersona, ZonaSegura
 from grafica.mobility import *
 import numpy as np
 import threading
-from microsimulacion.celular import Celuar
+# from microsimulacion.celular import Celuar
 import math
 
 
@@ -51,10 +51,10 @@ class IniciarGrafica(threading.Thread):
                    ]
         lugares_agrupacion = []
 
-        celulares = []
-        #creamos 50 celulares * 29 puntos para usarlos con los puntos
-        for cel in range(29 * 50):
-            celulares.append(Celuar())
+        # celulares = []
+        # #creamos 50 celulares * 29 puntos para usarlos con los puntos
+        # for cel in range(29 * 50):
+        #     celulares.append(Celuar())
 
         grupos = [
             tvc(50, (900, 550), (0.1, .5), [.99, 0.6], [100, 100], (157, 91), antenas),
