@@ -36,6 +36,7 @@ class IniciarGrafica(threading.Thread):
         print("R -  Muestra o oculta el radio de antena")
         print("P -  Muestra o oculta personas")
         print("Z -  Muestra o oculta zonas seguras")
+        print("Q -  Para cerrar")
 
 
         width = 1024
