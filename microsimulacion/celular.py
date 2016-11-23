@@ -8,11 +8,13 @@ class Celuar(object):
         self.x, self.y = (0, 0)
         self.estado = 0
         self.antena_actual = None
-    
+
     def enviar_mensaje(self):
         if self.estado == 2:
+            antena_actual.send_package()
 
     def set_antenas_disponibles(self, antenas):
+        antenas[0].AddColaConexion("%d user" % self.name)
 
 
     def generator(self, env, TIME_MSG):

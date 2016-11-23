@@ -7,7 +7,7 @@ from grafica.elements import Mapa, Antena, DibujaPersona, ZonaSegura
 from grafica.mobility import *
 import numpy as np
 import threading
-# from microsimulacion.celular import Celuar
+from microsimulacion.celular import Celuar
 import math
 
 
@@ -19,9 +19,11 @@ class IniciarGrafica(threading.Thread):
     def get_antenas(self, x, y, antenas):
         listado = list()
         for antena in antenas:
-            if antena.radio > math.hypot(data[0] - antena.x, data[1] - antena.y):
+            if self.is_in_range(x, y, antena):
                 listado.append(antena)
 
+    def is_in_range(self, x, y, antena):
+        return antena.radio > math.hypot(x - antena.x, y - antena.y)
 
     def run(self):
         # params
@@ -38,10 +40,8 @@ class IniciarGrafica(threading.Thread):
         print("Z -  Muestra o oculta zonas seguras")
         print("Q -  Para cerrar")
 
-
         width = 1024
         height = 600
-
 
         # pos x, posy, radio covertura
         antenas = [Antena(230, 377, 10),
@@ -53,10 +53,11 @@ class IniciarGrafica(threading.Thread):
                    ]
         lugares_agrupacion = []
 
-        # celulares = []
-        # #creamos 50 celulares * 29 puntos para usarlos con los puntos
-        # for cel in range(29 * 50):
-        #     celulares.append(Celuar())
+        celulares = []
+        # creamos 50 celulares * 29 puntos para usarlos con los puntos
+        # 3,2%
+        for cel in range(29 * 50):
+            celulares.append(Celuar())
 
         grupos = [
             tvc(50, (900, 550), (0.1, .5), [.99, 0.6], [100, 100], (157, 91), antenas),
@@ -135,6 +136,13 @@ class IniciarGrafica(threading.Thread):
         show_personas = True
         show_zonas = True
 
+        index = 0
+        for grupo in grupos:
+            for row in next(grupo):
+                celular = celulares[index_cel]
+                celular.name = "C%d" % index
+                index += 1
+
         while True:
 
             if show_mapa:
@@ -151,16 +159,20 @@ class IniciarGrafica(threading.Thread):
                 index_cel = 0
                 for grupo in grupos:
                     for row in next(grupo):
-                        # celular = celulares[index_cel]
-                        # x = row[0]
-                        # y = row[1]
-                        # celular.x = x
-                        # celular.y = y
-                        # celular.set_antenas_disponibles(get.get_antenas(x, y, antenas))
-                        DibujaPersona(screen, row, antenas)
-                        if row[2] > 2:
-                            name = "%s-%s" % (row[0], row[1])
-                            self.antenaSim.addToQueue(name)
+                        celular = celulares[index_cel]
+                        x = row[0]
+                        y = row[1]
+                        celular.x = x
+                        celular.y = y
+                        antena_actual = celular.antena_actual
+                        if antena_actual:
+                            if not self.is_in_range(x, y, antena_actual):
+                                celular.antena_actual = None
+                        else:
+                            antenas_disponibles = get.get_antenas(x, y, antenas)
+                            celular.set_antenas_disponibles(antenas_disponibles)
+                        DibujaPersona(screen, [x, y], celular.estado)
+                        
 
             # detectamos teclas
             for event in pygame.event.get():

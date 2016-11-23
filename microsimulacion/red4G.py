@@ -3,13 +3,13 @@ import random
 
 
 class Red4G(object):
-    def __init__(self, env, espacio_disponibles, trafico):
+    def __init__(self, env, capacidad, trafico, eventoPE):
         self.env = env
-        self.espacio_disponibles = espacio_disponibles
+        self.eventoPE = eventoPE
+        self.espacio_disponibles = capacidad
         self.trafico = trafico
 
-    def addToQueue(self, name):
-        print("entro ", name)
+    def AddColaConexion(self, name):
         print('%0.3f #%s Solicitando acceso 4G' % (self.env.now, name))
         duration = 0.01
         yield self.env.process(self.hold(duration))
@@ -121,6 +121,31 @@ class Red4G(object):
             print('{} {} Target eNB -> Source eNB: Liberación de contexto de UE'.format(self.env.now, name))
             duration = 0.05 + self.trafico
             yield self.env.process(self.hold(duration))
+
+    def SendPackage(self, NodeName):
+        print('%0.3f #%s Solicita enviar paquete cia 4G' % (self.env.now, name))
+        duration = 0.01
+        yield self.env.process(self.hold(duration))
+
+        with self.espacio_disponibles.request() as req:
+            start = self.env.now
+            yield req
+
+            print('{} {} UE, Source eNB / Source eNB, Target eNB, MME, Serving Gateway -> Paquete de datos'.format(self.env.now, name))
+            duration = 0.02 + self.trafico
+            yield self.env.process(self.hold(duration))
+
+            print('{} {} Target eNB, MME, Serving Gateway -> Paquete de datos'.format(self.env.now, name))
+            duration = 0.03 + self.trafico
+            yield self.env.process(self.hold(duration))
+
+            
+            print('{} {} Serving Gateway, MME, Target eNB -> Paquete de datos'.format(self.env.now, name))
+            duration = 0.03 + self.trafico
+            yield self.env.process(self.hold(duration))
+
+            self.eventoPE.addToQueue("%s_%s" % (name, "EVENTO"))
+
 
     def hold(self, duration):
         yield self.env.timeout(duration)

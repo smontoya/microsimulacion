@@ -35,29 +35,28 @@ ANTENAS = 6
 env = simpy.rt.RealtimeEnvironment(factor=0.01)
 
 
-#number of processors
-# procesors = simpy.Resource(env, PROCESORS)
+procesors = simpy.Resource(env, PROCESORS)
 antena = simpy.Resource(env, USER_PER_ANTENA * ANTENAS)
-red4G = Red4G(env, antena, USER_PER_ANTENA * ANTENAS)
 
 env.process(slow_proc(env))
-grafica = IniciarGrafica(red4G)
-grafica.start()
 
 # l1_cache = simpy.Container(env, L1_CACHE_SIZE, init=0)
 # l2_cache = simpy.Container(env, L2_CACHE_SIZE, init=0)
 # ram = simpy.Container(env, RAM_SIZE, init=0)
 
-# eventoPE = AnalizadorEvento(env, procesors)
-# tweetPE = AnalizadorTweet(env, procesors, eventoPE)
-# appPE = IngresoPorAplicacion(env, procesors, eventoPE)
+eventoPE = AnalizadorEvento(env, procesors)
+tweetPE = AnalizadorTweet(env, procesors, eventoPE)
+appPE = IngresoPorAplicacion(env, procesors, eventoPE)
+red4G = Red4G(env, antena, USER_PER_ANTENA * ANTENAS, eventoPE)
 
-# duplicadoPE = DuplicacionInfo(env, procesors)
-# mapaPE = ProcesaMapa(env, procesors)
-# rankingPE = ProcesaRanking(env, procesors)
+duplicadoPE = DuplicacionInfo(env, procesors)
+mapaPE = ProcesaMapa(env, procesors)
+rankingPE = ProcesaRanking(env, procesors)
 
-# env.process(appPE.generator(env, procesors, TIME_BT_EVENT))
+env.process(appPE.generator(env, procesors, TIME_BT_EVENT))
 
+grafica = IniciarGrafica(red4G)
+grafica.start()
 
 # env.process(red4G.generator(env, antena, [1, 2]))
 env.run(1000)

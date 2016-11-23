@@ -46,16 +46,12 @@ class ZonaSegura(pygame.sprite.Sprite):
 
 
 
-def DibujaPersona(screen, data, antenas):
+def DibujaPersona(screen, data, estado):
     color = (50, 50, 50)
-
-    for antena in antenas:
-        if antena.radio > math.hypot(data[0] - antena.x, data[1] - antena.y):
-            if data[2] > 2:
-                color = (0, 0, 250)
-            else:
-                color = (0, 243, 10)
-            break
+    if estado > 2:
+        color = (0, 0, 250)
+    elif estado == 1:
+        color = (0, 243, 10)
 
     # color = (2, 0, 250)
 
