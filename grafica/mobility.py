@@ -736,7 +736,7 @@ def reference_point_group(nr_nodes, dimensions, velocity=(0.1, 1.), aggregation=
 
         yield np.dstack((x, y))[0]
         
-def tvc(nr_nodes, dimensions, velocity=(0.1, 1.), aggregation=[0.5,0.], epoch=[100,100], safepoint=[0,0]):
+def tvc(nr_nodes, dimensions, velocity=(0.1, 1.), aggregation=[0.5,0.], epoch=[100,100], safepoint=[0,0], antenas=[]):
     '''
     Time-variant Community Mobility Model, discussed in the paper
     
@@ -810,8 +810,12 @@ def tvc(nr_nodes, dimensions, velocity=(0.1, 1.), aggregation=[0.5,0.], epoch=[1
     MIN_V, MAX_V = velocity
     FL_DISTR = lambda SAMPLES: U(0, FL_MAX, SAMPLES)
     VELOCITY_DISTR = lambda FD: U(MIN_V, MAX_V, FD)
-    
-    def wrap(x, y):
+    ants = []
+    for ant in antenas:
+        ants.append([ant.x, ant.y, ant.radio])
+    ANTENAS = np.array(ants)
+
+    def wrap(x, y, antenas):
         b = np.where(x < 0)[0]
         if b.size > 0:
             x[b] += 1
@@ -828,7 +832,7 @@ def tvc(nr_nodes, dimensions, velocity=(0.1, 1.), aggregation=[0.5,0.], epoch=[1
     MAX_X, MAX_Y = dimensions
     x = U(50, MAX_X, NODES)
     y = U(100, MAX_Y, NODES)
-    conection = U(0, 3, NODES)
+    conection = U(0, 4, NODES)
     velocity = 1.
     theta = U(0, 2*np.pi, NODES)
     costheta = np.cos(theta)
@@ -864,22 +868,22 @@ def tvc(nr_nodes, dimensions, velocity=(0.1, 1.), aggregation=[0.5,0.], epoch=[1
             # g_y= [ 124.1118854]
             g_y = g_y + g_velocity * g_sintheta
             
-            g_x[0]= safepoint[0]
-            g_y[0]= safepoint[1]
+            g_x[0] = safepoint[0]
+            g_y[0] = safepoint[1]
             
             # group wrap around when outside the margins (torus shaped area)
-            wrap(g_x, g_y)
+            wrap(g_x, g_y, ANTENAS)
             
             # update info for arrived groups
             g_arrived = np.where(np.logical_and(g_velocity>0., g_fl<=0.))[0]
             g_fl = g_fl - g_velocity
            
-            if g_arrived.size > 10:
-                g_theta = U(0, 2*np.pi, g_arrived)
-                g_costheta[g_arrived] = np.cos(g_theta)
-                g_sintheta[g_arrived] = np.sin(g_theta)
-                g_fl[g_arrived] = FL_DISTR(g_arrived)
-                g_velocity[g_arrived] = VELOCITY_DISTR(g_fl[g_arrived])
+            # if gauss_markovrived.size > 10:
+            #     g_theta = U(0, 2*np.pi, g_arrived)
+            #     g_costheta[g_arrived] = np.cos(g_theta)
+            #     g_sintheta[g_arrived] = np.sin(g_theta)
+            #     g_fl[g_arrived] = FL_DISTR(g_arrived)
+            #     g_velocity[g_arrived] = VELOCITY_DISTR(g_fl[g_arrived])
             
             # update node position according to group center
             for (i, g) in enumerate(groups):

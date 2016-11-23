@@ -2,19 +2,19 @@ import itertools
 import random
 
 
-class Antena4G(object):
-    def __init__(self, env, processors, trafico):
+class Red4G(object):
+    def __init__(self, env, espacio_disponibles, trafico):
         self.env = env
-        self.espacion_disponibles = espacion_disponibles
+        self.espacio_disponibles = espacio_disponibles
         self.trafico = trafico
 
     def addToQueue(self, name):
-
+        print("entro ", name)
         print('%0.3f #%s Solicitando acceso 4G' % (self.env.now, name))
         duration = 0.01
         yield self.env.process(self.hold(duration))
 
-        with self.espacion_disponibles.request() as req:
+        with self.espacio_disponibles.request() as req:
             start = self.env.now
             yield req
 
