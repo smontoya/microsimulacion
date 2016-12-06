@@ -148,8 +148,8 @@ class Antena4G(object):
             duration = 0.05 + self.trafico
             total = total + duration
             yield self.env.process(self.hold(duration))
-            
-            print('{} {} Duración Modelo 4G: {}'.format(self.env.now, name, total))
+
+        print('{} {} Duración Modelo 4G: {}'.format(self.env.now, name, total))
 
     def hold(self, duration):
         yield self.env.timeout(duration)
