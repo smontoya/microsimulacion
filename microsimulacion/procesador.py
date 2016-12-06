@@ -1,9 +1,15 @@
 import simpy 
 
-class Procesador(object):
-	def __init__(self, env):
-        self.env = env
-        # Start the run process everytime an instance is created.
-        self.action = env.process(self.run())
-        
-	processors = simpy.Resource(self.env, capacity=4)
+
+class ProcesadorResource(simpy.Resource):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.data = []
+
+    def request(self, *args, **kwargs):
+        self.data.append((self._env.now, len(self.queue)))
+        return super().request(*args, **kwargs)
+
+    def release(self, *args, **kwargs):
+        self.data.append((self._env.now, len(self.queue)))
+        return super().release(*args, **kwargs)

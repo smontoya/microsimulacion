@@ -20,7 +20,7 @@ class IngresoPorAplicacion(object):
             print('%0.3f #%s ANALISIS DE INGRESO POR APP TERMINADO' % (self.env.now, name))
 
             # se entrega para que lo agarre la cola de eventos
-            self.eventoPE.addToQueue("%s_%s" % (name, "EVENTO"))
+        self.eventoPE.addToQueue("%s_%s" % (name, "EVENTO"))
 
     def hold(self, duration):
         yield self.env.timeout(duration)

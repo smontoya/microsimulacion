@@ -19,15 +19,18 @@ class AnalizadorTweet(object):
             start = self.env.now
             # Request one of the procesors
             yield req
+        with self.processors.request() as req:
 
             print('%0.3f #%s Analizando tweet' % (self.env.now, name))
             duration = 2
             yield self.env.process(self.hold(duration))
 
+        with self.processors.request() as req:
             print('%0.3f #%s Tomando geo y fecha ' % (self.env.now, name))
             duration = 0.5
             yield self.env.process(self.hold(duration))
 
+        with self.processors.request() as req:
             print('%0.3f #%s Categorizando tweett' % (self.env.now, name))
             duration = 2
             yield self.env.process(self.hold(duration))
@@ -44,3 +47,10 @@ class AnalizadorTweet(object):
         for i in itertools.count():
             yield env.timeout(random.randint(*TIME_TWEET))
             env.process(self.addToQueue('Tweet %d' % i))
+
+    def ProcessChecker(env, preocessorUsage):
+        """Periodically check the USAGE CPU."""
+        while True:
+            print("procesdores %s" % str(preocessorUsage))
+
+            yield env.timeout(10)  # Check every 10 seconds
