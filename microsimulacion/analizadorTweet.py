@@ -10,35 +10,39 @@ class AnalizadorTweet(object):
         self.eventoPE = eventoPE
 
     def addToQueue(self, name):
-
+        total = 0
         print('%0.3f #%s Encolando tweet' % (self.env.now, name))
         duration = 0.05
+        total = total + duration
         yield self.env.process(self.hold(duration))
 
         with self.processors.request() as req:
             start = self.env.now
             # Request one of the procesors
             yield req
-        with self.processors.request() as req:
 
+        with self.processors.request() as req:
             print('%0.3f #%s Analizando tweet' % (self.env.now, name))
             duration = 2
+            total = total + duration
             yield self.env.process(self.hold(duration))
 
         with self.processors.request() as req:
             print('%0.3f #%s Tomando geo y fecha ' % (self.env.now, name))
             duration = 0.5
+            total = total + duration
             yield self.env.process(self.hold(duration))
 
         with self.processors.request() as req:
             print('%0.3f #%s Categorizando tweett' % (self.env.now, name))
             duration = 2
+            total = total + duration
             yield self.env.process(self.hold(duration))
-
             print('%0.3f #%s ANALISIS TWEET TERMINADO' % (self.env.now, name))
-
             # se entrega para que lo agarre la cola de eventos
             self.eventoPE.addToQueue("%s_%s" % (name, "EVENTO"))
+
+        print('{} {} Duración Analizador de Twwet: {}'.format(self.env.now, name, total))
 
     def hold(self, duration):
         yield self.env.timeout(duration)

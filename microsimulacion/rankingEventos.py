@@ -8,8 +8,9 @@ class ProcesaRanking(object):
 
     def addToQueue(self, name):
 
-        print('%0.3f #%s Cola de Ingreso a Ranking de Eventos' % (self.env.now, name))
+        print('%0.3f #%s Cola de Ingreso a ranking de Eventos' % (self.env.now, name))
         duration = 0.05
+        total = total + duration
         yield self.env.process(self.hold(duration))
 
         with self.processors.request() as req:
@@ -19,38 +20,42 @@ class ProcesaRanking(object):
 
             print('%0.3f #%s Acceso a BD del Eventos' % (self.env.now, name))
             duration = 0.05
+            total = total + duration
             yield self.env.process(self.hold(duration))
 
             print('%0.3f #%s Selección de tabla de Eventos' % (self.env.now, name))
             duration = 0.1
+            total = total + duration
             yield self.env.process(self.hold(duration))
 
             print('%0.3f #%s Realiza consulta de conteo por categoría' % (self.env.now, name))
             duration = 0.05
+            total = total + duration
             yield self.env.process(self.hold(duration))
-
 
             print('%0.3f #%s Nueva ejecución de la consulta de conteo por categoría' % (self.env.now, name))
             duration = 0.1
+            total = total + duration
             yield self.env.process(self.hold(duration))
             posibilidad_error = random.randint(1,100)
 
-            while(posibilidad_error<10) :
-       
+            while(posibilidad_error < 10) :
 	            print('Error en ejecución de consulta')
 	            print('%0.3f #%s Nueva ejecución de la consulta de conteo por categoría' % (self.env.now, name))
 	            duration = 0.1
+	            total = total + duration
 	            yield self.env.process(self.hold(duration))
 	            posibilidad_error = random.randint(1,100)
 
-
             print('%0.3f #%s Generación de ranking actualizado' % (self.env.now, name))
             duration = 1.5
+            total = total + duration
             yield self.env.process(self.hold(duration))
 
-
             # se entrega para que lo agarre la cola de eventos
-            self.eventoPE.addToQueue("%s_%s" % (name, "ACTUALIZA MAPA DE CALOR"))
+            self.eventoPE.addToQueue("%s_%s" % (name, "Actualiza mapa de calor"))
+
+        print('{} {} Duración Ranking de Eventos: {}'.format(self.env.now, name, total))
 
     def hold(self, duration):
         yield self.env.timeout(duration)

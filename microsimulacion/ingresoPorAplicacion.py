@@ -7,19 +7,20 @@ class IngresoPorAplicacion(object):
         self.eventoPE = eventoPE
 
     def addToQueue(self, name):
-
+        total = 0
         print('%0.3f #%s Encolando ingreso por App' % (self.env.now, name))
         duration = 0.05
+        total = total + duration
+        
         yield self.env.process(self.hold(duration))
 
         with self.processors.request() as req:
             start = self.env.now
             # Request one of the procesors
             yield req
+            print('%0.3f #%s Analisis de ingreso por app terminado' % (self.env.now, name))
 
-            print('%0.3f #%s ANALISIS DE INGRESO POR APP TERMINADO' % (self.env.now, name))
-
-            # se entrega para que lo agarre la cola de eventos
+        print('{} {} Duración Ingreso por App: {}'.format(self.env.now, name, total))
         self.eventoPE.addToQueue("%s_%s" % (name, "EVENTO"))
 
     def hold(self, duration):
@@ -28,4 +29,4 @@ class IngresoPorAplicacion(object):
     def generator(self, env, processors, TIME_APP):
         for i in itertools.count():
             yield env.timeout(random.randint(*TIME_APP))
-            env.process(self.addToQueue('ingreso por aplicación %d' % i))
+            env.process(self.addToQueue('Ingreso por App %d' % i))

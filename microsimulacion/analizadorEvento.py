@@ -8,9 +8,10 @@ class AnalizadorEvento(object):
         self.processors = processors
 
     def addToQueue(self, name):
-
+        total = 0
         print('%0.3f #%s Recibiendo informacion.' % (self.env.now, name))
         duration = 0.05
+        total = total + duration
         yield self.env.process(self.hold(duration))
 
         with self.processors.request() as req:
@@ -19,32 +20,33 @@ class AnalizadorEvento(object):
             yield req
 
         with self.processors.request() as req:
-
             # deberian ser dos hilos uno apra el semantico y otro para el
             # analizador de mapa y ranking db
             print('%0.3f %s Analizando semánticamente ' % (self.env.now, name))
             duration = 1
+            total = total + duration
             yield self.env.process(self.hold(duration))
 
         with self.processors.request() as req:
-
             print('%0.3f %s Análsis de Categoria' % (self.env.now, name))
             duration = 0.5
+            total = total + duration
             yield self.env.process(self.hold(duration))
             posibilidad_error = random.randint(1,50)
 
-            while(posibilidad_error<10) :
-       
+            while(posibilidad_error < 10):
                 print('%0.3f %s Análsis de Categoria' % (self.env.now, name))
                 duration = 0.5
+                total = total + duration
                 yield self.env.process(self.hold(duration))
                 posibilidad_error = random.randint(1,100)
 
-
-
             print('%0.3f %s Agregando a BD' % (self.env.now, name))
             duration = 0.1
+            total = total + duration
             yield self.env.process(self.hold(duration))
+
+        print('{} {} Duración Analizador de Eventos: {}'.format(self.env.now, name, total))
 
     def hold(self, duration):
         yield self.env.timeout(duration)
