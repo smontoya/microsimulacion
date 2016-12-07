@@ -8,40 +8,44 @@ class AnalizadorTweet(object):
         self.env = env
         self.processors = processors
         self.eventoPE = eventoPE
+        self.data = []
+        self.entrantes = 0
+        self.salientes = 0
 
     def addToQueue(self, name):
         total = 0
-        print('%0.3f #%s Encolando tweet' % (self.env.now, name))
-        duration = 0.05
-        total = total + duration
-        yield self.env.process(self.hold(duration))
+        start = self.env.now
+        self.entrantes += 1
 
         with self.processors.request() as req:
-            start = self.env.now
+            print('%0.3f #%s Encolando tweet' % (self.env.now, name))
+            duration = 0.05 + self.processors.getUsage() / 100
+            yield self.env.process(self.hold(duration))
             # Request one of the procesors
             yield req
 
         with self.processors.request() as req:
             print('%0.3f #%s Analizando tweet' % (self.env.now, name))
-            duration = 2
-            total = total + duration
+            duration = 2 + self.processors.getUsage() / 100
+            yield req
             yield self.env.process(self.hold(duration))
 
         with self.processors.request() as req:
             print('%0.3f #%s Tomando geo y fecha ' % (self.env.now, name))
-            duration = 0.5
-            total = total + duration
+            duration = 1 + self.processors.getUsage() / 100
             yield self.env.process(self.hold(duration))
 
         with self.processors.request() as req:
             print('%0.3f #%s Categorizando tweett' % (self.env.now, name))
-            duration = 2
-            total = total + duration
+            duration = 2 + self.processors.getUsage() / 100
             yield self.env.process(self.hold(duration))
             print('%0.3f #%s ANALISIS TWEET TERMINADO' % (self.env.now, name))
             # se entrega para que lo agarre la cola de eventos
             self.eventoPE.addToQueue("%s_%s" % (name, "EVENTO"))
-
+        end = self.env.now
+        total = end - start
+        self.data.append([name, total])
+        self.salientes += 1
         print('{} {} Duración Analizador de Twwet: {}'.format(self.env.now, name, total))
 
     def hold(self, duration):
@@ -49,12 +53,5 @@ class AnalizadorTweet(object):
 
     def generator(self, env, processors, TIME_TWEET):
         for i in itertools.count():
-            yield env.timeout(random.randint(*TIME_TWEET))
+            yield env.timeout(random.randint(*TIME_TWEET) /10)
             env.process(self.addToQueue('Tweet %d' % i))
-
-    def ProcessChecker(env, preocessorUsage):
-        """Periodically check the USAGE CPU."""
-        while True:
-            print("procesdores %s" % str(preocessorUsage))
-
-            yield env.timeout(10)  # Check every 10 seconds

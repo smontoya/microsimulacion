@@ -36,7 +36,7 @@ env = simpy.rt.RealtimeEnvironment(factor=0.01)
 
 
 procesors = simpy.Resource(env, PROCESORS)
-antena = simpy.Resource(env, USER_PER_ANTENA * ANTENAS)
+antena = simpy.Resource(env, 2)
 
 env.process(slow_proc(env))
 
@@ -54,6 +54,7 @@ mapaPE = ProcesaMapa(env, procesors)
 rankingPE = ProcesaRanking(env, procesors)
 
 env.process(appPE.generator(env, procesors, TIME_BT_EVENT))
+env.process(tweetPE.generator(env, procesors, TIME_BT_TWEET))
 
 grafica = IniciarGrafica(red4G)
 grafica.start()
